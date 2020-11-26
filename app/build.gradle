@@ -81,6 +81,9 @@ dependencies {
     implementation "androidx.test:core:$androidXTestCoreVersion"
 
     implementation "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
+
+    implementation "com.jakewharton.timber:timber:$timberVersion"
+
 }
 repositories {
     mavenCentral()
