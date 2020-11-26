@@ -3,6 +3,7 @@ package com.example.clone.archtecture.todo
 import android.app.Application
 import androidx.viewbinding.BuildConfig
 import com.example.clone.archtecture.todo.data.source.TaskRepository
+import timber.log.Timber
 
 /**
  * 이 Application은 repository를 느슨하게 제공한다.
