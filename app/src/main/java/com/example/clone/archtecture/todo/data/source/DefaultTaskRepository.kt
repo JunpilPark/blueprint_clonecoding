@@ -4,16 +4,13 @@ import androidx.lifecycle.LiveData
 import com.example.clone.archtecture.todo.data.Result
 import com.example.clone.archtecture.todo.data.Result.*
 import com.example.clone.archtecture.todo.data.Task
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlin.coroutines.coroutineContext
 
 class DefaultTaskRepository(
         private val taskRemoteDataSource: TaskDataSource,
         private val taskLocalDataSource: TaskDataSource,
-        private val ioDispatcher: CoroutineDispatcher
+        private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ): TaskRepository {
 
     override fun observeTask(): LiveData<Result<List<Task>>> {
