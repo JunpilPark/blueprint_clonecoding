@@ -2,7 +2,12 @@ package com.example.clone.archtecture.todo
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
+import androidx.room.Room
+import com.example.clone.archtecture.todo.data.source.DefaultTaskRepository
 import com.example.clone.archtecture.todo.data.source.TaskRepository
+import com.example.clone.archtecture.todo.data.source.local.TaskLocalDataSource
+import com.example.clone.archtecture.todo.data.source.local.ToDoDatabase
+import kotlinx.coroutines.runBlocking
 
 /*TODO
  * 1. synchronized(lock) 은 무엇인가?
@@ -17,13 +22,52 @@ import com.example.clone.archtecture.todo.data.source.TaskRepository
  */
 object ServiceLocator {
 
+    private val lock = Any()
+    private var database: ToDoDatabase? = null
     @Volatile
     var tasksRepository: TaskRepository? = null
         @VisibleForTesting set // set 하는 내역이 테스트에 쓰인다는 것을 명시적으로 알리기 위함인가?
 
     fun providerTasksRepository(context: Context) {
         synchronized(this) {
-            return tasksRepository ?: tasksRepository ?: createTaskRepository(context)
+            return tasksRepository ?: createTaskRepository(context)
         }
     }
+
+    private fun createTaskRepository(context: Context): TaskRepository {
+        val newRepo = DefaultTaskRepository(FakeTasksRemoteDataSource, createTaskLocalDataSource(context))
+        tasksRepository = newRepo
+        return newRepo
+    }
+
+    private fun createTaskLocalDataSource(context: Context): TasksDataSource {
+        val database = database ?: createDataBase(context)
+        return TaskLocalDataSource(database.taskDao())
+    }
+
+    private fun createDataBase(context: Context): ToDoDatabase {
+        val result = Room.databaseBuilder(
+                context.applicationContext,
+                ToDoDatabase::class.java, "Tasks.db"
+        ).build()
+        database = result
+        return result
+    }
+
+    @VisibleForTesting
+    fun resetRepository() {
+        synchronized(lock) {
+            runBlocking {
+                FakeTasksRemoteDataSource.deleteAllTasks()
+            }
+            database?.apply {
+                clearAllTables()
+                close()
+            }
+            database = null
+            tasksRepository = null
+        }
+    }
+
+
 }
