@@ -3,7 +3,9 @@ package com.example.clone.archtecture.todo
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.room.Room
+import com.example.clone.archtecture.todo.data.FakeTasksRemoteDataSource
 import com.example.clone.archtecture.todo.data.source.DefaultTaskRepository
+import com.example.clone.archtecture.todo.data.source.TaskDataSource
 import com.example.clone.archtecture.todo.data.source.TaskRepository
 import com.example.clone.archtecture.todo.data.source.local.TaskLocalDataSource
 import com.example.clone.archtecture.todo.data.source.local.ToDoDatabase
@@ -28,7 +30,7 @@ object ServiceLocator {
     var tasksRepository: TaskRepository? = null
         @VisibleForTesting set // set 하는 내역이 테스트에 쓰인다는 것을 명시적으로 알리기 위함인가?
 
-    fun providerTasksRepository(context: Context) {
+    fun providerTasksRepository(context: Context): TaskRepository {
         synchronized(this) {
             return tasksRepository ?: createTaskRepository(context)
         }
@@ -40,7 +42,7 @@ object ServiceLocator {
         return newRepo
     }
 
-    private fun createTaskLocalDataSource(context: Context): TasksDataSource {
+    private fun createTaskLocalDataSource(context: Context): TaskDataSource {
         val database = database ?: createDataBase(context)
         return TaskLocalDataSource(database.taskDao())
     }
