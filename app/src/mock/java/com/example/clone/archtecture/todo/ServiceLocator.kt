@@ -30,7 +30,7 @@ object ServiceLocator {
     var tasksRepository: TaskRepository? = null
         @VisibleForTesting set // set 하는 내역이 테스트에 쓰인다는 것을 명시적으로 알리기 위함인가?
 
-    fun providerTasksRepository(context: Context): TaskRepository {
+    fun provideTasksRepository(context: Context): TaskRepository {
         synchronized(this) {
             return tasksRepository ?: createTaskRepository(context)
         }
